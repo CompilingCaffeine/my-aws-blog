@@ -1,4 +1,9 @@
-# How I Passed the AWS SAA-C03 (After Initially Feeling Completely Lost)
++++
+date = '2026-05-27T00:00:00-07:00'
+draft = false
+title = 'How I Passed the AWS SAA-C03 (After Initially Feeling Completely Lost)'
+tags = ['aws', 'certification', 'saa-c03', 'solutions-architect', 'study-tips']
++++
 
 When I started studying for the AWS Certified Solutions Architect Associate exam (SAA-C03), I thought it would be straightforward. I already worked in IT. I had touched cloud concepts before. I figured it would mostly be connecting dots and memorizing a few services.
 
