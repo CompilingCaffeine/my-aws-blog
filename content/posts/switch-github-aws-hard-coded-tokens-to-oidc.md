@@ -20,8 +20,6 @@ With OIDC:
 
 In other words, OIDC reduces both risk and maintenance.
 
----
-
 ## What the old setup usually looks like
 
 A secrets-based GitHub Actions step often looks like this:
@@ -39,8 +37,6 @@ This pattern depends on an IAM user with long-lived access keys. Those keys need
 
 With OIDC, that step changes to a role assumption flow instead.
 
----
-
 ## How OIDC works between GitHub and AWS
 
 At a high level, the flow is:
@@ -56,8 +52,6 @@ GitHub documents the AWS-specific OIDC setup here:
 - [GitHub Docs: Configuring OpenID Connect in Amazon Web Services](https://docs.github.com/en/actions/how-tos/secure-your-work/security-harden-deployments/oidc-in-aws?apiVersion=2022-11-28)
 - [AWS IAM Docs: Create an OpenID Connect identity provider](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers_create_oidc.html)
 
----
-
 ## Prerequisites
 
 Before you switch, make sure you have:
@@ -72,8 +66,6 @@ For this walkthrough, I'll assume:
 - Your workflow deploys from the `main` branch
 - Your workflow uploads to an S3 bucket
 - Your workflow optionally creates a CloudFront invalidation afterward
-
----
 
 ## Step 1: Add GitHub as an OIDC provider in AWS IAM
 
@@ -98,8 +90,6 @@ sts.amazonaws.com
 7. Save the provider
 
 That tells AWS to trust GitHub as a token issuer for workloads that match your IAM role trust policies.
-
----
 
 ## Step 2: Create an IAM role that GitHub Actions can assume
 
@@ -142,8 +132,6 @@ repo:YOUR_GITHUB_ORG/YOUR_REPO:environment:production
 
 That is a great option if you want environment protection rules and approvals layered on top of OIDC.
 
----
-
 ## Step 3: Attach a least-privilege permissions policy
 
 The role also needs permission to do the actual deployment work.
@@ -183,8 +171,6 @@ For a Hugo static site deployment to S3 plus a CloudFront invalidation, a policy
 ```
 
 If your workflow only uploads to S3 and does not invalidate CloudFront, you can drop the final statement.
-
----
 
 ## Step 4: Update your GitHub Actions workflow
 
@@ -246,8 +232,6 @@ The nice part is that the rest of your workflow usually stays the same. You stil
 
 > **Tip:** For production workflows, pin third-party actions to a full commit SHA when possible instead of relying only on a moving version tag.
 
----
-
 ## Step 5: Remove the old GitHub secrets
 
 Once the OIDC-based workflow succeeds, clean up the old credentials:
@@ -258,8 +242,6 @@ Once the OIDC-based workflow succeeds, clean up the old credentials:
 4. If the IAM user existed only for GitHub Actions, consider deleting the user entirely
 
 This is the step that actually reduces your long-lived credential footprint.
-
----
 
 ## Step 6: Verify the new flow
 
@@ -280,8 +262,6 @@ If you want an extra sanity check, you can temporarily add:
 ```
 
 That confirms the workflow is running under the expected IAM role.
-
----
 
 ## Common gotchas
 
@@ -304,8 +284,6 @@ That is fine. You only need one GitHub OIDC provider per AWS account. Reuse it a
 ### Pull requests from forks
 
 Be careful here. Do not broaden your trust policy unless you truly want forked or preview workflows to assume AWS roles.
-
----
 
 ## Summary
 

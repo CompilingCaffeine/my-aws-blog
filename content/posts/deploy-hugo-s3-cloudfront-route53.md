@@ -16,8 +16,6 @@ Before starting, make sure you have:
 - A domain name registered in Route 53 (or transferred there)
 - The [AWS CLI](https://aws.amazon.com/cli/) installed and configured
 
----
-
 ## Step 1: Build Your Hugo Site
 
 Run the Hugo build command to generate your static files:
@@ -27,8 +25,6 @@ hugo --minify
 ```
 
 This outputs your site into the `public/` directory.
-
----
 
 ## Step 2: Create and Configure an S3 Bucket
 
@@ -59,8 +55,6 @@ aws s3 sync public/ s3://your-domain.com --delete
 
 The `--delete` flag removes files from S3 that no longer exist locally, keeping your bucket in sync.
 
----
-
 ## Step 3: Request an SSL Certificate via ACM
 
 CloudFront requires a certificate in the **us-east-1** region.
@@ -76,8 +70,6 @@ aws acm request-certificate \
 After requesting, go to the **AWS Certificate Manager** console, find your certificate, and add the DNS validation CNAME records to Route 53. ACM can do this automatically if your domain is in Route 53 — click **"Create records in Route 53"** in the console.
 
 Wait a few minutes for the certificate status to show **Issued**.
-
----
 
 ## Step 4: Create a CloudFront Distribution
 
@@ -154,8 +146,6 @@ aws s3api put-bucket-policy \
   --policy file://bucket-policy.json
 ```
 
----
-
 ## Step 5: Configure Route 53
 
 ### Create an A record (Alias) for your domain
@@ -175,8 +165,6 @@ aws s3api put-bucket-policy \
 4. Repeat for `www` by setting **Record name** to `www`.
 
 It typically takes a few minutes for DNS to propagate.
-
----
 
 ## Step 6: Handle Hugo's Clean URLs (Optional but Recommended)
 
@@ -203,8 +191,6 @@ function handler(event) {
 ```
 
 Associate this function with your CloudFront distribution under **Viewer request** for the default cache behavior.
-
----
 
 ## Step 7: Automate Deployments (Optional)
 
@@ -233,8 +219,6 @@ echo "Deployment complete!"
 
 The CloudFront invalidation ensures visitors always get the latest version of your content.
 
----
-
 ## Summary
 
 Here's a quick recap of what we set up:
@@ -245,7 +229,5 @@ Here's a quick recap of what we set up:
 - **Route 53** routes your custom domain to the CloudFront distribution via Alias records
 
 This architecture is highly reliable, globally fast, and extremely cost-effective for static sites — you only pay for storage and bandwidth, with no servers to manage.
-
----
 
 *A note on how this post came together: this guide was written with the help of [Claude AI](https://claude.ai). Throughout the process of setting this up myself, I leaned heavily on AI tools to troubleshoot each stage, research AWS services, and make sense of the documentation. If you're working through a similar setup, I'd highly recommend doing the same — it makes navigating the AWS ecosystem a lot less painful.*
