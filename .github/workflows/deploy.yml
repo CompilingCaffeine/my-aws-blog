@@ -17,16 +17,16 @@ jobs:
     steps:
       # 1. Grab your code from GitHub
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           submodules: true  # CRITICAL: This ensures your Hugo theme is downloaded
           fetch-depth: 0    
 
       # 2. Install Hugo on the GitHub server
       - name: Setup Hugo
-        uses: peaceiris/actions-hugo@v3
+        uses: peaceiris/actions-hugo@2752ce1d29631191ea3f27c23495fa06139a5b78 # v3
         with:
-          hugo-version: 'latest'
+          hugo-version: '0.163.0'
           extended: true
 
       # 3. Build the static HTML files
@@ -35,7 +35,7 @@ jobs:
 
       # UPDATED: Assume the IAM Role using OIDC instead of Secrets
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4
         with:
           role-to-assume: arn:aws:iam::304119515519:role/GitHubActions-HugoDeployRole
           aws-region: us-east-1

@@ -1,4 +1,4 @@
-baseURL = 'https://example.org/'
+baseURL = 'https://lazu.click/'
 locale = 'en-us'
 title = "Lazare's AWS Blog"
 theme = 'ananke'
