@@ -5,3 +5,4 @@ theme = 'ananke'
 
 [params]
 description = "Notes on software, systems, and the craft of building."
+favicon = "favicon.svg"
