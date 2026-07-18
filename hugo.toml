@@ -1,4 +1,7 @@
 baseURL = 'https://lazu.click/'
 locale = 'en-us'
-title = "Lazare's AWS Blog"
+title = "Lazare's Coding Blog"
 theme = 'ananke'
+
+[params]
+description = "Notes on software, systems, and the craft of building."
