@@ -3,6 +3,10 @@ locale = 'en-us'
 title = "Lazare's Coding Blog"
 theme = 'ananke'
 
+[caches]
+  [caches.images]
+  dir = ':cacheDir/images'
+
 [params]
 description = "Notes on software, systems, and the craft of building."
 favicon = "favicon.svg"
