@@ -1,0 +1,8 @@
+{{- /* Section headings get a self-link. It is an affordance only — the
+       heading text itself always carries the meaning. */ -}}
+<h{{ .Level }} id="{{ .Anchor }}">
+  {{- .Text -}}
+  {{- if le .Level 4 }}
+  <a class="heading-anchor" href="#{{ .Anchor }}" aria-label="Link to this section">#</a>
+  {{- end }}
+</h{{ .Level }}>

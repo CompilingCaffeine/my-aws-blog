@@ -1,0 +1,14 @@
+{{- /*
+  One post as a full-row link: title, explicit description, date, reading
+  time and tags. Rows are separated by rules inside a single panel rather
+  than floated as individual cards.
+*/ -}}
+<li>
+  <a class="post-row" href="{{ .RelPermalink }}">
+    <span class="post-row__title">{{ .Title }}</span>
+    {{- with .Description }}
+    <p class="post-row__desc">{{ . }}</p>
+    {{- end }}
+    {{ partial "post-meta.html" (dict "page" .) }}
+  </a>
+</li>

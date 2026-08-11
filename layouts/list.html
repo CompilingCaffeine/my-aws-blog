@@ -1,0 +1,20 @@
+{{ define "main" }}
+{{- /* Section archive (/posts/). Uses the same rows as the homepage.
+       .Paginator is called so Hugo keeps generating /posts/page/1/, which the
+       stock Ananke list template produced; pagerSize is set high enough in
+       hugo.toml that the archive still lists every post on one page. */ -}}
+{{- $pages := .Paginator.Pages -}}
+<div class="shell">
+  <div class="page-head">
+    <p class="kicker kicker--path">~/{{ .Section | default "posts" }}</p>
+    <h1 class="page-head__title">{{ .Title }}</h1>
+    {{- with .Content }}
+    <div class="page-head__intro">{{ . }}</div>
+    {{- else }}
+    <p class="page-head__intro">Everything published here, newest first.</p>
+    {{- end }}
+  </div>
+
+  {{ partial "post-list.html" (dict "pages" $pages "title" (printf "~/%s" (.Section | default "posts"))) }}
+</div>
+{{ end }}

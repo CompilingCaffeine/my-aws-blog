@@ -1,0 +1,18 @@
+{{ define "main" }}
+{{- /* A single tag (/tags/aws/). Standard post rows.
+       .Paginator keeps /tags/<term>/page/1/ generated, as the stock theme did. */ -}}
+{{- $pages := .Paginator.Pages -}}
+<div class="shell">
+  <div class="page-head">
+    <p class="kicker kicker--path">~/{{ .Data.Plural }}/{{ urlize .Title }}</p>
+    <h1 class="page-head__title">{{ .Data.Term }}</h1>
+    <p class="page-head__intro">
+      {{ len .Pages }} {{ cond (eq (len .Pages) 1) "post" "posts" }} tagged
+      <em>{{ .Data.Term }}</em>.
+      <a class="link-underline" href="{{ ("/tags/" | relURL) }}">All tags</a>
+    </p>
+  </div>
+
+  {{ partial "post-list.html" (dict "pages" $pages "title" (printf "~/%s/%s" .Data.Plural (urlize .Title))) }}
+</div>
+{{ end }}

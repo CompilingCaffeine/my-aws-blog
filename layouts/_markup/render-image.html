@@ -1,0 +1,16 @@
+{{- /* Images keep their aspect ratio, stay inside the article, and are lazy
+       below the fold. Intrinsic dimensions are emitted when the file is a
+       page resource, which is what keeps CLS at zero. */ -}}
+{{- $src := .Destination -}}
+{{- $w := 0 -}}
+{{- $h := 0 -}}
+{{- with (or (.Page.Resources.GetMatch .Destination) (resources.Get .Destination)) -}}
+  {{- $src = .RelPermalink -}}
+  {{- if eq .ResourceType "image" -}}
+    {{- $w = .Width -}}
+    {{- $h = .Height -}}
+  {{- end -}}
+{{- end -}}
+<img src="{{ $src | safeURL }}" alt="{{ .PlainText }}"
+  {{- if $w }} width="{{ $w }}" height="{{ $h }}"{{ end }}
+  {{- with .Title }} title="{{ . }}"{{ end }} loading="lazy" decoding="async">

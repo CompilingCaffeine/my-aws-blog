@@ -1,1 +1,17 @@
-
+{{- /* Small and static. The portfolio's interactive terminal footer is not ported. */ -}}
+<footer class="site-footer">
+  <div class="site-footer__inner">
+    <span>© {{ now.Format "2006" }} {{ site.Params.author }}</span>
+    <div class="site-footer__links">
+      {{- with site.Home.OutputFormats.Get "RSS" }}
+      <a href="{{ .RelPermalink }}">
+        {{ partial "icon.html" (dict "name" "rss" "size" 13) }}rss
+      </a>
+      {{- end }}
+      <a href="{{ site.Params.portfolio }}">
+        {{ site.Params.portfolioLabel }}
+        {{- partial "icon.html" (dict "name" "arrow-up-right" "size" 12) }}
+      </a>
+    </div>
+  </div>
+</footer>

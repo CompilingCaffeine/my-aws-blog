@@ -2,6 +2,7 @@
 date = '2026-04-15T00:00:00-07:00'
 draft = false
 title = 'How to Deploy a Hugo Static Site with S3, CloudFront, and Route 53'
+description = 'A step-by-step walkthrough of hosting a Hugo site on a private S3 bucket, serving it through CloudFront with OAC and ACM, and pointing a Route 53 domain at it.'
 tags = ['hugo', 'aws', 's3', 'cloudfront', 'route53', 'devops']
 +++
 

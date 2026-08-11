@@ -1,0 +1,78 @@
+{{- /*
+  One compact sticky application toolbar. Related to the portfolio's Nav
+  without its section tracking or resume/GitHub actions. Below 640px the
+  links wrap to a second row inside the same panel — always visible rather
+  than a JS disclosure, so it stays keyboard-operable by construction.
+*/ -}}
+{{- $rss := "" -}}
+{{- with site.Home.OutputFormats.Get "RSS" }}{{ $rss = .RelPermalink }}{{ end -}}
+{{- $links := slice
+  (dict "href" ("/posts/" | relURL) "label" "posts" "icon" "folder")
+  (dict "href" ("/tags/" | relURL) "label" "tags" "icon" "tag")
+-}}
+{{- if $rss }}{{ $links = $links | append (dict "href" $rss "label" "rss" "icon" "rss") }}{{ end -}}
+{{- $cur := .RelPermalink -}}
+
+<header class="site-header no-print">
+  <nav class="site-header__bar panel" aria-label="Primary">
+    <div class="site-header__row1">
+      <span class="dots site-header__dots" aria-hidden="true">
+        <i style="background: var(--coral)"></i>
+        <i style="background: var(--amber)"></i>
+        <i style="background: var(--mint)"></i>
+      </span>
+
+      <a class="brand" href="{{ "/" | relURL }}">
+        <span class="brand__mark" aria-hidden="true">LH</span>
+        <span>lazare.exe</span>
+        <span class="brand__sub">/&nbsp;blog</span>
+      </a>
+
+      <ul class="site-nav site-header__inline-nav">
+        {{- range $links }}
+        {{- $match := and (ne .label "rss") (hasPrefix $cur .href) }}
+        <li>
+          <a class="site-nav__link" href="{{ .href }}"{{ if $match }} aria-current="{{ cond (eq $cur .href) "page" "true" }}"{{ end }}>
+            {{ partial "icon.html" (dict "name" .icon "size" 13) }}{{ .label }}
+          </a>
+        </li>
+        {{- end }}
+      </ul>
+
+      <div class="site-header__actions">
+        <a class="btn btn-sm site-header__portfolio" href="{{ site.Params.portfolio }}">
+          <span>{{ site.Params.portfolioLabel }}</span>
+          {{ partial "icon.html" (dict "name" "arrow-up-right" "size" 12) }}
+        </a>
+        <button type="button" id="theme-toggle" class="btn btn-sm btn-icon theme-toggle" aria-label="Toggle light and dark theme" title="Toggle theme">
+          {{ partial "icon.html" (dict "name" "sun" "size" 16 "class" "theme-icon-light") }}
+          {{ partial "icon.html" (dict "name" "moon" "size" 16 "class" "theme-icon-dark") }}
+        </button>
+      </div>
+    </div>
+
+    {{- /* Phones: the same links on a second row inside the panel, plus the
+           portfolio link that does not fit beside the brand at 320px. */ -}}
+    <ul class="site-nav site-header__row2">
+      {{- range $links }}
+      {{- $match := and (ne .label "rss") (hasPrefix $cur .href) }}
+      <li>
+        <a class="site-nav__link" href="{{ .href }}"{{ if $match }} aria-current="{{ cond (eq $cur .href) "page" "true" }}"{{ end }}>
+          {{ partial "icon.html" (dict "name" .icon "size" 13) }}{{ .label }}
+        </a>
+      </li>
+      {{- end }}
+      <li>
+        <a class="site-nav__link" href="{{ site.Params.portfolio }}">
+          {{ site.Params.portfolioLabel }}
+          {{- partial "icon.html" (dict "name" "arrow-up-right" "size" 11) }}
+        </a>
+      </li>
+    </ul>
+  </nav>
+</header>
+
+{{- with resources.Get "js/theme.js" }}
+  {{- $js := . | minify | fingerprint }}
+<script src="{{ $js.RelPermalink }}" integrity="{{ $js.Data.Integrity }}" defer></script>
+{{- end }}

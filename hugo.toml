@@ -1,6 +1,10 @@
-baseURL = 'https://lazu.click/'
+baseURL = 'https://blog.herzi.ai/'
 locale = 'en-us'
 title = "Lazare's Coding Blog"
+
+# The vendored Ananke theme stays installed so its static assets keep their
+# existing URLs, but every template that renders a page is now project-owned
+# under layouts/. Nothing in themes/ananke/ is edited.
 theme = 'ananke'
 
 [caches]
@@ -10,3 +14,33 @@ theme = 'ananke'
 [params]
 description = "Notes on software, systems, and the craft of building."
 favicon = "favicon.svg"
+author = "Lazare Herzi"
+# Where the blog links back to.
+portfolio = "https://lazare.herzi.ai"
+portfolioLabel = "lazare.exe"
+# Compact header identity, paired with the LH mark.
+brand = "lazare.exe / blog"
+mainSections = ["posts"]
+
+# The section and term templates call .Paginator so Hugo keeps generating the
+# /posts/page/1/ and /tags/<term>/page/1/ routes the stock theme produced. The
+# pager is set high enough that those lists still show every post on one page.
+[pagination]
+pagerSize = 100
+
+[markup]
+  [markup.goldmark.renderer]
+  unsafe = false
+  [markup.highlight]
+  # Emit Chroma classes rather than inline styles so code blocks can follow
+  # the same light/dark tokens as everything else.
+  noClasses = false
+  lineNos = false
+  tabWidth = 2
+  wrapperClass = "highlight"
+
+# os.Getenv is allowlisted; the default list is HUGO_* and CI only, so the
+# build-environment contract needs VERCEL_ENV added explicitly.
+[security]
+  [security.funcs]
+  getenv = ['^HUGO_', '^CI$', '^VERCEL_ENV$']

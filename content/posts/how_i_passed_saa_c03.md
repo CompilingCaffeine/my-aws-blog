@@ -2,6 +2,7 @@
 date = '2026-05-27T00:00:00-07:00'
 draft = false
 title = 'How I Passed the AWS SAA-C03 (After Initially Feeling Completely Lost)'
+description = 'Why passive video-watching stalled my SAA-C03 prep, and the active recall and practice-exam routine that actually got me through the exam.'
 tags = ['aws', 'certification', 'saa-c03', 'solutions-architect', 'study-tips']
 +++
 

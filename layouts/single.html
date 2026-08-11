@@ -1,0 +1,56 @@
+{{ define "main" }}
+{{- $slug := "" -}}
+{{- with .File }}{{ $slug = .ContentBaseName }}{{ else }}{{ $slug = path.Base .RelPermalink }}{{ end -}}
+<div class="shell article-shell">
+  <a class="crumb" href="{{ "/posts/" | relURL }}">
+    {{ partial "icon.html" (dict "name" "arrow-left" "size" 13) }} posts
+  </a>
+
+  {{- /* One reading surface. A single title bar carries the workstation
+         motif; nothing inside gets its own panel. */ -}}
+  <article class="article panel">
+    <div class="titlebar">
+      <span class="dots" aria-hidden="true">
+        <i style="background: var(--coral)"></i>
+        <i style="background: var(--amber)"></i>
+        <i style="background: var(--mint)"></i>
+      </span>
+      <span class="titlebar__name">
+        {{- partial "icon.html" (dict "name" "file" "size" 13) }}
+        <span class="titlebar__text">~/posts/{{ $slug }}.md</span>
+      </span>
+    </div>
+
+    <div class="article__inner">
+      <h1 class="article__title">{{ .Title }}</h1>
+      <div class="article__meta">
+        {{ partial "post-meta.html" (dict "page" . "links" true) }}
+      </div>
+      <div class="prose">
+        {{ .Content }}
+      </div>
+    </div>
+  </article>
+
+  {{- $newer := .NextInSection -}}
+  {{- $older := .PrevInSection -}}
+  {{- if or $newer $older }}
+  <nav class="article__nav" aria-label="More posts">
+    {{- with $newer }}
+    <a class="article__nav-link" href="{{ .RelPermalink }}">
+      <span class="article__nav-label">← newer post</span>
+      <span class="article__nav-title">{{ .Title }}</span>
+    </a>
+    {{- else }}
+    <span></span>
+    {{- end }}
+    {{- with $older }}
+    <a class="article__nav-link article__nav-link--next" href="{{ .RelPermalink }}">
+      <span class="article__nav-label">older post →</span>
+      <span class="article__nav-title">{{ .Title }}</span>
+    </a>
+    {{- end }}
+  </nav>
+  {{- end }}
+</div>
+{{ end }}

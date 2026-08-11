@@ -1,0 +1,16 @@
+{{ define "main" }}
+<div class="shell">
+  <div class="panel notfound">
+    <p class="notfound__code" aria-hidden="true">404</p>
+    <h1>Page not found</h1>
+    <p class="notfound__msg">
+      That URL does not exist on this blog. It may have moved, or never
+      existed in the first place.
+    </p>
+    <a class="btn btn-primary" href="{{ "/posts/" | relURL }}">
+      {{ partial "icon.html" (dict "name" "folder" "size" 15) }}
+      Back to posts
+    </a>
+  </div>
+</div>
+{{ end }}
