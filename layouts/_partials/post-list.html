@@ -1,0 +1,33 @@
+{{- /*
+  The one post-list surface: an outlined panel with window chrome and
+  separated rows. Shared by the homepage, the archive and every tag page so
+  they cannot drift apart.
+
+  Call: {{ partial "post-list.html" (dict "pages" $pages "title" "~/posts") }}
+*/ -}}
+{{- $pages := .pages -}}
+{{- $title := .title | default "~/posts" -}}
+<div class="panel" style="overflow: hidden">
+  <div class="titlebar">
+    <span class="dots" aria-hidden="true">
+      <i style="background: var(--iris)"></i>
+      <i style="background: var(--surface)"></i>
+      <i style="background: var(--surface)"></i>
+    </span>
+    <span class="titlebar__name">
+      {{- partial "icon.html" (dict "name" "folder" "size" 13) }}
+      <span class="titlebar__text">{{ $title }}</span>
+    </span>
+    <span class="titlebar__meta">{{ len $pages }} {{ cond (eq (len $pages) 1) "file" "files" }}</span>
+  </div>
+
+  {{- if $pages }}
+  <ul class="post-list">
+    {{- range $pages }}
+      {{- partial "post-row.html" . }}
+    {{- end }}
+  </ul>
+  {{- else }}
+  <p class="empty-note">No posts here yet.</p>
+  {{- end }}
+</div>

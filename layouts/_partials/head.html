@@ -1,0 +1,103 @@
+{{- /*
+  Project-owned <head>. This replaces Ananke's baseof entirely, so every page
+  emits exactly one canonical, one robots directive, one Open Graph set, one
+  Twitter set and one JSON-LD graph.
+*/ -}}
+{{- $isHome := .IsHome -}}
+{{- $name := .Title -}}
+{{- if eq .Kind "404" }}{{ $name = "Page not found" }}{{ end -}}
+{{- if eq .Kind "term" }}{{ $name = printf "%s: %s" (title .Data.Singular) .Data.Term }}{{ end -}}
+{{- $title := cond (or $isHome (not $name)) site.Title (printf "%s | %s" $name site.Title) -}}
+
+{{- /* Explicit descriptions everywhere. Never the opening paragraphs of a post. */ -}}
+{{- $desc := .Description -}}
+{{- if not $desc -}}
+  {{- if eq .Kind "term" -}}
+    {{- $desc = printf "Posts tagged %s on %s." .Data.Term site.Title -}}
+  {{- else if eq .Kind "taxonomy" -}}
+    {{- $desc = printf "Every %s used across the posts on %s." .Data.Singular site.Title -}}
+  {{- else if eq .Kind "section" -}}
+    {{- $desc = printf "Every post on %s." site.Title -}}
+  {{- else -}}
+    {{- $desc = site.Params.description -}}
+  {{- end -}}
+{{- end -}}
+
+{{- /* Build-environment contract: VERCEL_ENV=production and the GitHub Actions
+       build (where VERCEL_ENV is absent) are production; preview and
+       development are not. `hugo server` runs the development environment and
+       is non-production too. */ -}}
+{{- $vercelEnv := os.Getenv "VERCEL_ENV" -}}
+{{- $indexable := and hugo.IsProduction (ne $vercelEnv "preview") (ne $vercelEnv "development") -}}
+{{- /* The error body is served under many URLs; it should never be one of them. */ -}}
+{{- if eq .Kind "404" }}{{ $indexable = false }}{{ end -}}
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ $title }}</title>
+<meta name="description" content="{{ $desc }}">
+{{ hugo.Generator }}
+<meta name="robots" content="{{ cond $indexable "index, follow, max-image-preview:large" "noindex, nofollow" }}">
+{{- with site.Params.author }}
+<meta name="author" content="{{ . }}">
+{{- end }}
+<meta name="theme-color" content="#f3eee2" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#161814" media="(prefers-color-scheme: dark)">
+
+{{- /* Applies a stored theme before first paint so the page never flashes
+       light-then-dark. Kept tiny and inline on purpose. */ -}}
+<script>(function(){try{var t=localStorage.getItem("theme");if(t==="dark"||t==="light"){document.documentElement.setAttribute("data-theme",t)}}catch(e){}})();</script>
+
+{{- with resources.Get "css/blog.css" }}
+  {{- $css := . | minify | fingerprint }}
+<link rel="preload" href="{{ "fonts/Geist-Variable.woff2" | relURL }}" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}">
+{{- end }}
+
+{{ partial "site-favicon.html" . }}
+
+{{- /* Site feed is discoverable from every page; a list page that has its own
+       feed advertises that too. */ -}}
+{{- $siteFeed := "" -}}
+{{- with site.Home.OutputFormats.Get "RSS" }}{{ $siteFeed = .Permalink }}
+<link rel="alternate" type="application/rss+xml" href="{{ .Permalink }}" title="{{ site.Title }}">
+{{- end }}
+{{- with .OutputFormats.Get "RSS" }}{{ if ne .Permalink $siteFeed }}
+<link rel="alternate" type="application/rss+xml" href="{{ .Permalink }}" title="{{ site.Title }} — {{ $.Title }}">
+{{- end }}{{ end }}
+
+{{- if ne .Kind "404" }}
+<link rel="canonical" href="{{ .Permalink }}">
+{{- end }}
+
+{{- $ogImage := absURL "og-default.png" }}
+<meta property="og:site_name" content="{{ site.Title }}">
+<meta property="og:locale" content="en_US">
+<meta property="og:type" content="{{ cond .IsPage "article" "website" }}">
+<meta property="og:url" content="{{ .Permalink }}">
+<meta property="og:title" content="{{ cond (or $isHome (not $name)) site.Title $name }}">
+<meta property="og:description" content="{{ $desc }}">
+<meta property="og:image" content="{{ $ogImage }}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="lazare.exe / blog — {{ site.Params.description }}">
+{{- if .IsPage }}
+<meta property="article:published_time" content="{{ .Date.Format "2006-01-02T15:04:05Z07:00" }}">
+{{- if not .Lastmod.IsZero }}
+<meta property="article:modified_time" content="{{ .Lastmod.Format "2006-01-02T15:04:05Z07:00" }}">
+{{- end }}
+{{- with site.Params.author }}
+<meta property="article:author" content="{{ . }}">
+{{- end }}
+{{- range .Params.tags }}
+<meta property="article:tag" content="{{ . }}">
+{{- end }}
+{{- end }}
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ cond (or $isHome (not $name)) site.Title $name }}">
+<meta name="twitter:description" content="{{ $desc }}">
+<meta name="twitter:image" content="{{ $ogImage }}">
+<meta name="twitter:image:alt" content="lazare.exe / blog — {{ site.Params.description }}">
+
+{{ partial "schema.html" . }}

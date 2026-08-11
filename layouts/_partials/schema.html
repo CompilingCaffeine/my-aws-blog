@@ -1,0 +1,85 @@
+{{- /*
+  One coherent JSON-LD graph per page. Built with dict/slice and handed to
+  jsonify so escaping is the encoder's problem, not the template's.
+*/ -}}
+{{- $desc := "" -}}
+{{- with .Description }}{{ $desc = . }}{{ else }}{{ $desc = site.Params.description }}{{ end -}}
+
+{{- $home := site.Home.Permalink -}}
+{{- $blogID := printf "%s#blog" $home -}}
+{{- $image := absURL "og-default.png" -}}
+
+{{- $author := dict
+  "@type" "Person"
+  "name" site.Params.author
+  "url" site.Params.portfolio
+-}}
+
+{{- $blog := dict
+  "@type" "Blog"
+  "@id" $blogID
+  "url" $home
+  "name" site.Title
+  "description" site.Params.description
+  "inLanguage" "en-US"
+  "author" $author
+  "publisher" $author
+-}}
+
+{{- $nodes := slice -}}
+
+{{- if .IsHome -}}
+  {{- $posts := slice -}}
+  {{- range (where site.RegularPages "Section" "in" site.Params.mainSections).ByDate.Reverse -}}
+    {{- $posts = $posts | append (dict
+      "@type" "BlogPosting"
+      "@id" (printf "%s#post" .Permalink)
+      "url" .Permalink
+      "headline" .Title
+      "datePublished" (.Date.Format "2006-01-02T15:04:05Z07:00")
+    ) -}}
+  {{- end -}}
+  {{- $nodes = $nodes | append (merge $blog (dict "blogPost" $posts)) -}}
+
+{{- else if and .IsPage (in site.Params.mainSections .Section) -}}
+  {{- $crumbs := slice
+    (dict "@type" "ListItem" "position" 1 "name" "Posts" "item" (printf "%sposts/" $home))
+    (dict "@type" "ListItem" "position" 2 "name" .Title)
+  -}}
+  {{- $post := dict
+    "@type" "BlogPosting"
+    "@id" (printf "%s#post" .Permalink)
+    "mainEntityOfPage" (dict "@type" "WebPage" "@id" .Permalink)
+    "url" .Permalink
+    "headline" .Title
+    "description" $desc
+    "inLanguage" "en-US"
+    "datePublished" (.Date.Format "2006-01-02T15:04:05Z07:00")
+    "dateModified" (.Lastmod.Format "2006-01-02T15:04:05Z07:00")
+    "wordCount" .WordCount
+    "image" $image
+    "author" $author
+    "publisher" $author
+    "isPartOf" (dict "@id" $blogID)
+  -}}
+  {{- with .Params.tags -}}
+    {{- $post = merge $post (dict "keywords" (delimit . ", ")) -}}
+  {{- end -}}
+  {{- $nodes = $nodes | append $post -}}
+  {{- $nodes = $nodes | append (dict "@type" "BreadcrumbList" "itemListElement" $crumbs) -}}
+  {{- $nodes = $nodes | append $blog -}}
+
+{{- else -}}
+  {{- $nodes = $nodes | append (dict
+    "@type" (cond .IsPage "WebPage" "CollectionPage")
+    "@id" .Permalink
+    "url" .Permalink
+    "name" .Title
+    "description" $desc
+    "inLanguage" "en-US"
+    "isPartOf" (dict "@id" $blogID)
+  ) -}}
+  {{- $nodes = $nodes | append $blog -}}
+{{- end -}}
+
+<script type="application/ld+json">{{ (dict "@context" "https://schema.org" "@graph" $nodes) | jsonify | safeJS }}</script>

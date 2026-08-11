@@ -1,0 +1,1389 @@
+/* ==========================================================================
+   blog.herzi.ai
+   The reading pane of the lazare.herzi.ai workstation.
+
+   Tokens, shapes and motion rules are ported verbatim from the portfolio's
+   src/app/globals.css. Everything Tailwind generated there is hand-written
+   here so the blog needs no build step beyond Hugo itself.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   0. FONTS — self-hosted Geist, see NOTICE-fonts.md for provenance/licence.
+   -------------------------------------------------------------------------- */
+
+@font-face {
+  font-family: "Geist";
+  src: url("/fonts/Geist-Variable.woff2") format("woff2-variations");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Geist Mono";
+  src: url("/fonts/GeistMono-Variable.woff2") format("woff2-variations");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ==========================================================================
+   1. TOKENS
+   Warm paper base, near-black drawn outlines, accents used in small doses.
+   ========================================================================== */
+
+:root {
+  color-scheme: light;
+
+  --bg: #f3eee2;
+  --bg-grid: #dfd6c2;
+  --surface: #fffdf6;
+  --surface-alt: #ebe3d2;
+  --surface-sunken: #e3dac6;
+  --ink: #1c1b18;
+  --muted: #635f52;
+  --border: #22211d;
+  --border-soft: #c9c0ac;
+
+  /* Saturated accents — for fills, borders, dots and badges. Too light to
+     set type in, which is what the -ink pair below is for. */
+  --iris: #6a4bd4;
+  --amber: #e8b02f;
+  --sky: #4ea3da;
+  --mint: #5fbb91;
+  --coral: #e5765b;
+
+  /* Text-safe accents: same hue, darkened until they clear WCAG AA. */
+  --iris-ink: #6547c9;
+  --amber-ink: #775b18;
+  --sky-ink: #306486;
+  --mint-ink: #356951;
+  --coral-ink: #914b3a;
+
+  /* Tinted washes for accent regions — kept pale so accents stay concentrated. */
+  --iris-wash: #ece7fb;
+  --amber-wash: #fbf0d3;
+  --sky-wash: #e2f1fb;
+  --mint-wash: #e0f3ea;
+  --coral-wash: #fbe7e1;
+
+  --shadow: #22211d;
+  --focus: #6a4bd4;
+
+  --radius-panel: 18px;
+  --radius-card: 14px;
+  --radius-btn: 12px;
+
+  --font-sans: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, "SFMono-Regular", "SF Mono", Menlo,
+    monospace;
+
+  /* Layout */
+  --shell: 72rem;
+  --gutter: 1.25rem;
+  --header-h: 4.75rem;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  /* Cozy terminal, not OLED void: warm charcoal with a green cast. */
+  --bg: #161814;
+  --bg-grid: #23261f;
+  --surface: #1f221c;
+  --surface-alt: #282c24;
+  --surface-sunken: #14160f;
+  --ink: #ece5d4;
+  --muted: #9a9585;
+  --border: #3c4136;
+  --border-soft: #333830;
+
+  --iris: #a48df0;
+  --amber: #f0c559;
+  --sky: #7cc3ec;
+  --mint: #7fd3aa;
+  --coral: #f0937b;
+
+  /* Dark accents already clear AA on the dark surfaces, so the text-safe
+     pair simply aliases them. */
+  --iris-ink: var(--iris);
+  --amber-ink: var(--amber);
+  --sky-ink: var(--sky);
+  --mint-ink: var(--mint);
+  --coral-ink: var(--coral);
+
+  --iris-wash: #272446;
+  --amber-wash: #332d18;
+  --sky-wash: #1b2c39;
+  --mint-wash: #1b2f27;
+  --coral-wash: #37231d;
+
+  --shadow: #0a0b08;
+  --focus: #a48df0;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+
+    --bg: #161814;
+    --bg-grid: #23261f;
+    --surface: #1f221c;
+    --surface-alt: #282c24;
+    --surface-sunken: #14160f;
+    --ink: #ece5d4;
+    --muted: #9a9585;
+    --border: #3c4136;
+    --border-soft: #333830;
+
+    --iris: #a48df0;
+    --amber: #f0c559;
+    --sky: #7cc3ec;
+    --mint: #7fd3aa;
+    --coral: #f0937b;
+
+    --iris-ink: var(--iris);
+    --amber-ink: var(--amber);
+    --sky-ink: var(--sky);
+    --mint-ink: var(--mint);
+    --coral-ink: var(--coral);
+
+    --iris-wash: #272446;
+    --amber-wash: #332d18;
+    --sky-wash: #1b2c39;
+    --mint-wash: #1b2f27;
+    --coral-wash: #37231d;
+
+    --shadow: #0a0b08;
+    --focus: #a48df0;
+  }
+}
+
+/* ==========================================================================
+   2. BASE
+   ========================================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  border-color: var(--border);
+}
+
+html {
+  scroll-behavior: smooth;
+  /* Sticky header height + breathing room. */
+  scroll-padding-top: 6rem;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100%;
+  background-color: var(--bg);
+  /* Faint graph-paper grid: gives the page a surface instead of a void. */
+  background-image:
+    linear-gradient(to right, var(--bg-grid) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--bg-grid) 1px, transparent 1px);
+  background-size: 28px 28px;
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+.page {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+}
+
+img,
+svg,
+video {
+  max-width: 100%;
+  height: auto;
+}
+
+a {
+  color: inherit;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  line-height: 1.25;
+  margin: 0;
+  text-wrap: balance;
+}
+
+::selection {
+  background: var(--amber);
+  color: #1c1b18;
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* Skip link — visible only once focused. */
+.skip-link {
+  position: absolute;
+  left: 0.75rem;
+  top: -5rem;
+  z-index: 100;
+  padding: 0.6rem 1rem;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-btn);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  text-decoration: none;
+  transition: top 150ms ease;
+}
+.skip-link:focus {
+  top: 0.75rem;
+}
+
+.shell {
+  width: 100%;
+  max-width: var(--shell);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+@media (min-width: 640px) {
+  :root {
+    --gutter: 1.5rem;
+  }
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ==========================================================================
+   3. PRIMITIVES — drawn, tactile surfaces: 2px outline + hard offset shadow.
+   ========================================================================== */
+
+.panel {
+  background-color: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-panel);
+  box-shadow: 3px 3px 0 var(--shadow);
+}
+
+.panel-flat {
+  background-color: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-panel);
+}
+
+/* Application-window chrome. */
+.titlebar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.75rem;
+  border-bottom: 2px solid var(--border);
+  background-color: var(--surface-alt);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: lowercase;
+  color: var(--muted);
+  border-radius: calc(var(--radius-panel) - 2px) calc(var(--radius-panel) - 2px)
+    0 0;
+}
+.titlebar__name {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 0;
+}
+.titlebar__name svg {
+  flex: none;
+}
+/* The path itself is the part that truncates — a bare text node inside a flex
+   container cannot be ellipsised. */
+.titlebar__text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.titlebar__meta {
+  margin-inline-start: auto;
+  flex: none;
+  padding-inline-start: 0.5rem;
+}
+
+.dots {
+  display: inline-flex;
+  gap: 4px;
+  flex: none;
+}
+.dots i {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  border: 1.5px solid var(--border);
+  display: block;
+}
+
+.label {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* Tags are deliberately secondary, so they stay pill-sized rather than
+     44px — but clear WCAG 2.5.8's 24px minimum with room to spare. */
+  min-height: 26px;
+  gap: 0.35rem;
+  border: 1.5px solid var(--border);
+  border-radius: 999px;
+  padding: 0.15rem 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  line-height: 1.5;
+  background-color: var(--surface-alt);
+  color: inherit;
+  white-space: nowrap;
+  text-decoration: none;
+}
+a.pill:hover {
+  background-color: var(--iris-wash);
+  color: var(--iris-ink);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  min-height: 44px;
+  padding: 0.55rem 1.05rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-btn);
+  background-color: var(--surface);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 3px 3px 0 var(--shadow);
+  transition:
+    transform 120ms ease,
+    box-shadow 120ms ease,
+    background-color 120ms ease;
+}
+.btn:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 var(--shadow);
+}
+/* Button press compression. */
+.btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 var(--shadow);
+}
+
+.btn-primary {
+  background-color: var(--iris);
+  color: #fffdf6;
+}
+:root[data-theme="dark"] .btn-primary {
+  color: #161814;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .btn-primary {
+    color: #161814;
+  }
+}
+
+/* The portfolio's .btn-sm is 36px tall. Here it keeps the smaller type and
+   shadow but holds a 44px hit area, which this project requires of every
+   primary control. */
+.btn-sm {
+  min-height: 44px;
+  padding: 0.3rem 0.8rem;
+  font-size: 0.74rem;
+  box-shadow: 2px 2px 0 var(--shadow);
+}
+.btn-sm:hover {
+  box-shadow: 3px 3px 0 var(--shadow);
+}
+
+.btn-icon {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0.4rem;
+}
+
+.kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* Path-shaped kickers (~/notes, ~/tags/aws) stay lowercase: they are meant to
+   read as real paths, and paths are case-sensitive. */
+.kicker--path {
+  text-transform: none;
+  letter-spacing: 0.06em;
+  font-size: 0.78rem;
+}
+
+.link-underline {
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--border-soft);
+  transition: text-decoration-color 120ms ease;
+}
+.link-underline:hover {
+  text-decoration-color: currentColor;
+}
+
+/* ==========================================================================
+   4. HEADER
+   One compact sticky application toolbar. Related to the portfolio nav,
+   without its section tracking or resume/GitHub actions.
+   ========================================================================== */
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  padding: 0.75rem var(--gutter) 0;
+}
+
+.site-header__bar {
+  /* Matches .shell's content box, so the toolbar's outline lines up with the
+     panels below it rather than sitting a gutter wider. */
+  max-width: calc(var(--shell) - 2 * var(--gutter));
+  margin-inline: auto;
+  padding: 0.5rem 0.5rem;
+  background-color: color-mix(in srgb, var(--surface) 88%, transparent);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+.site-header__row1 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+@media (min-width: 640px) {
+  .site-header__bar {
+    padding: 0.5rem 0.75rem;
+  }
+  .site-header__row1 {
+    gap: 0.75rem;
+  }
+}
+
+.site-header__dots {
+  margin-inline-start: 0.25rem;
+  display: none;
+}
+@media (min-width: 640px) {
+  .site-header__dots {
+    display: inline-flex;
+  }
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 0.25rem;
+  border-radius: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.brand__mark {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  flex: none;
+  border: 2px solid var(--border);
+  border-radius: 6px;
+  background: var(--iris);
+  color: #fffdf6;
+  font-size: 10px;
+  font-weight: 700;
+}
+/* Dark mode lightens --iris, so paper-on-iris drops to 2.7:1. The mark flips
+   to dark ink there, the same way .btn-primary does. */
+:root[data-theme="dark"] .brand__mark {
+  color: #161814;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .brand__mark {
+    color: #161814;
+  }
+}
+
+.brand__sub {
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.site-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.125rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.site-nav__link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  /* Compact type, full-size target. */
+  min-height: 44px;
+  min-width: 44px;
+  border-radius: 0.5rem;
+  padding: 0.45rem 0.55rem;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--muted);
+  text-decoration: none;
+  transition: background-color 120ms ease, color 120ms ease;
+}
+.site-nav__link:hover {
+  background-color: var(--surface-alt);
+  color: var(--ink);
+}
+.site-nav__link[aria-current="page"] {
+  color: var(--ink);
+  background-color: var(--surface-alt);
+}
+
+@media (min-width: 640px) {
+  .site-nav__link {
+    padding: 0.45rem 0.6rem;
+  }
+}
+
+.site-header__actions {
+  margin-inline-start: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Below 640px the nav wraps to a second row inside the same panel; no
+   JavaScript disclosure, so it stays keyboard-operable by construction. */
+.site-header__row2 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem;
+  margin: 0.375rem 0 0;
+  padding: 0.375rem 0 0;
+  border-top: 2px solid var(--border-soft);
+}
+@media (min-width: 640px) {
+  .site-header__row2 {
+    display: none;
+  }
+}
+
+/* Below 640px the portfolio link moves to the second row; at 320px it does
+   not fit beside the brand and the theme control. */
+.site-header__portfolio {
+  display: none;
+}
+@media (min-width: 640px) {
+  .site-header__portfolio {
+    display: inline-flex;
+  }
+}
+.site-header__inline-nav {
+  display: none;
+}
+@media (min-width: 640px) {
+  .site-header__inline-nav {
+    display: flex;
+    margin-inline-start: 0.25rem;
+  }
+}
+
+.theme-toggle {
+  padding: 0.4rem;
+  min-width: 44px;
+  min-height: 44px;
+}
+
+/* Which icon shows follows the same three-state rule as the tokens, in CSS
+   only — so the control can never disagree with the palette it toggles.
+   Selectors are kept at matching specificity so the later rule wins. */
+:root .theme-icon-light {
+  display: block;
+}
+:root .theme-icon-dark {
+  display: none;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .theme-icon-light {
+    display: none;
+  }
+  :root:not([data-theme="light"]) .theme-icon-dark {
+    display: block;
+  }
+}
+:root[data-theme="dark"] .theme-icon-light {
+  display: none;
+}
+:root[data-theme="dark"] .theme-icon-dark {
+  display: block;
+}
+:root[data-theme="light"] .theme-icon-light {
+  display: block;
+}
+:root[data-theme="light"] .theme-icon-dark {
+  display: none;
+}
+
+/* ==========================================================================
+   5. PAGE HEADS
+   ========================================================================== */
+
+.site-main {
+  flex: 1 1 auto;
+  padding-block: 2.5rem 3.5rem;
+}
+
+@media (min-width: 640px) {
+  .site-main {
+    padding-block: 3.5rem 4.5rem;
+  }
+}
+
+.page-head {
+  margin-bottom: 1.75rem;
+}
+
+.page-head__title {
+  margin-top: 0.5rem;
+  font-size: clamp(1.75rem, 1.2rem + 2.4vw, 2.5rem);
+}
+
+.page-head__intro {
+  margin: 0.6rem 0 0;
+  max-width: 56ch;
+  color: var(--muted);
+  font-size: 1rem;
+}
+.page-head__intro p {
+  margin: 0;
+}
+.page-head__intro p + p {
+  margin-top: 0.5rem;
+}
+
+.crumb {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--muted);
+  text-decoration: none;
+  min-height: 44px;
+}
+.crumb:hover {
+  color: var(--ink);
+}
+
+/* ==========================================================================
+   6. POST LIST
+   One outlined panel of separated rows. Metadata is always rendered rather
+   than revealed on hover, so touch users lose nothing.
+   ========================================================================== */
+
+.post-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.post-list > li + li {
+  border-top: 2px solid var(--border-soft);
+}
+
+.post-row {
+  display: block;
+  padding: 1rem 1rem 1.05rem;
+  text-decoration: none;
+  transition: background-color 120ms ease;
+}
+.post-row:hover {
+  background-color: var(--surface-alt);
+}
+.post-list > li:last-child .post-row {
+  border-radius: 0 0 calc(var(--radius-panel) - 2px)
+    calc(var(--radius-panel) - 2px);
+}
+
+@media (min-width: 640px) {
+  .post-row {
+    padding: 1.125rem 1.25rem;
+  }
+}
+
+.post-row__title {
+  display: block;
+  font-size: 1.0625rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.35;
+}
+.post-row:hover .post-row__title {
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+}
+
+@media (min-width: 640px) {
+  .post-row__title {
+    font-size: 1.125rem;
+  }
+}
+
+.post-row__desc {
+  margin: 0.3rem 0 0;
+  color: var(--muted);
+  font-size: 0.9375rem;
+  max-width: 68ch;
+}
+
+.post-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 0.55rem;
+  margin-top: 0.55rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+.post-meta__sep {
+  opacity: 0.6;
+}
+.post-meta .pill {
+  font-size: 0.68rem;
+  padding: 0.1rem 0.5rem;
+}
+
+.post-row__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-inline-start: 0.15rem;
+}
+
+.empty-note {
+  padding: 1.25rem;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+}
+
+/* ==========================================================================
+   7. ARTICLE — one reading surface, 68–74ch of prose inside it.
+   ========================================================================== */
+
+/* The post page narrows the whole column — breadcrumb, surface and pager all
+   share one edge rather than the crumb floating out at the shell margin. */
+.article-shell {
+  max-width: calc(44rem + 2 * var(--gutter));
+}
+
+.article {
+  overflow: hidden;
+}
+
+.article__inner {
+  padding: 1.25rem 1.15rem 2rem;
+}
+
+@media (min-width: 640px) {
+  .article__inner {
+    padding: 2rem 2.25rem 2.75rem;
+  }
+}
+
+.article__title {
+  margin-top: 0.75rem;
+  font-size: clamp(1.75rem, 1.05rem + 3vw, 3.125rem);
+  line-height: 1.15;
+}
+
+.article__meta {
+  margin-top: 0.9rem;
+  padding-bottom: 1.1rem;
+  border-bottom: 2px solid var(--border-soft);
+}
+
+.article__nav {
+  margin-top: 1.75rem;
+  display: grid;
+  gap: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .article__nav {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.article__nav-link {
+  display: block;
+  padding: 0.85rem 1rem;
+  text-decoration: none;
+  background-color: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-card);
+  transition: background-color 120ms ease;
+}
+.article__nav-link:hover {
+  background-color: var(--surface-alt);
+}
+.article__nav-link--next {
+  text-align: right;
+}
+.article__nav-label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.article__nav-title {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+/* ==========================================================================
+   8. PROSE — long-form Markdown inside the reading surface.
+   ========================================================================== */
+
+.prose {
+  /* ~71 characters per line. Not `ch`: that unit is the advance of "0", which
+     in Geist is ~1.5x the average glyph, so 70ch renders closer to 100
+     characters. Measured in the browser instead — see the report table. */
+  max-width: 32em;
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+@media (min-width: 768px) {
+  .prose {
+    font-size: 1.0625rem;
+  }
+}
+
+/* One spacing rule for the whole flow; the heading rules below override it.
+   `margin: 0` rather than `margin-block: 0` — the UA sheet also puts 40px of
+   inline margin on blockquote and figure, which would break the left edge. */
+.prose > * {
+  margin: 0;
+}
+.prose > * + * {
+  margin-top: 1.15em;
+}
+.prose li > p {
+  margin: 0;
+}
+.prose li > p + p {
+  margin-top: 0.6em;
+}
+
+.prose h2,
+.prose h3,
+.prose h4 {
+  scroll-margin-top: 6.5rem;
+  letter-spacing: -0.01em;
+}
+
+.prose h2 {
+  margin-top: 2.25em;
+  padding-top: 0.6em;
+  border-top: 2px solid var(--border-soft);
+  font-size: 1.375rem;
+  line-height: 1.3;
+}
+
+.prose h3 {
+  margin-top: 1.8em;
+  font-size: 1.125rem;
+}
+
+.prose h4 {
+  margin-top: 1.6em;
+  font-size: 1rem;
+}
+
+.prose h2 + *,
+.prose h3 + *,
+.prose h4 + * {
+  margin-top: 0.7em;
+}
+
+.prose a {
+  color: var(--iris-ink);
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+  text-decoration-color: color-mix(in srgb, var(--iris-ink) 45%, transparent);
+  transition: text-decoration-color 120ms ease;
+  /* Long AWS console URLs must not push the surface wide. */
+  overflow-wrap: break-word;
+}
+.prose a:hover {
+  text-decoration-color: currentColor;
+}
+
+.prose strong {
+  font-weight: 650;
+  color: var(--ink);
+}
+
+.prose ul,
+.prose ol {
+  padding-inline-start: 1.35em;
+}
+.prose li + li {
+  margin-top: 0.4em;
+}
+.prose li > ul,
+.prose li > ol {
+  margin-top: 0.4em;
+}
+.prose ul {
+  list-style: none;
+  padding-inline-start: 1.15em;
+}
+.prose ul > li {
+  position: relative;
+}
+.prose ul > li::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: -0.95em;
+  top: 0.62em;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--iris);
+}
+.prose ol > li::marker {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  color: var(--muted);
+}
+
+.prose blockquote {
+  padding: 0.15em 0 0.15em 1.1em;
+  border-inline-start: 3px solid var(--border-soft);
+  color: var(--muted);
+}
+.prose blockquote > * + * {
+  margin-top: 0.8em;
+}
+
+.prose hr {
+  height: 0;
+  border: 0;
+  border-top: 2px solid var(--border-soft);
+  margin-block: 2.25em;
+}
+
+.prose img {
+  display: block;
+  height: auto;
+  max-width: 100%;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-card);
+}
+
+.prose figure {
+  margin: 0;
+}
+.prose figcaption {
+  margin-top: 0.5em;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+/* Inline code + code blocks share the sunken ground. */
+.prose :not(pre) > code {
+  font-family: var(--font-mono);
+  font-size: 0.86em;
+  padding: 0.15em 0.35em;
+  border: 1px solid var(--border-soft);
+  border-radius: 6px;
+  background: var(--surface-sunken);
+  overflow-wrap: break-word;
+}
+
+.prose pre,
+.prose .highlight {
+  border: 2px solid var(--border);
+  border-radius: var(--radius-card);
+  background: var(--surface-sunken);
+}
+
+.prose .highlight {
+  overflow: hidden;
+}
+.prose .highlight pre {
+  border: 0;
+  border-radius: 0;
+  margin: 0;
+}
+
+.prose pre {
+  /* Code scrolls inside its own box rather than widening the article. */
+  overflow-x: auto;
+  padding: 0.9rem 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: var(--ink);
+  -webkit-overflow-scrolling: touch;
+}
+.prose pre code {
+  font-family: inherit;
+  font-size: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+}
+
+/* Tables scroll inside the reading surface on narrow screens. */
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-card);
+}
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.prose thead {
+  background: var(--surface-alt);
+}
+.prose th,
+.prose td {
+  padding: 0.55rem 0.75rem;
+  text-align: start;
+  vertical-align: top;
+  border-bottom: 1px solid var(--border-soft);
+}
+.prose th {
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.prose tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+/* Anchor affordance on headings — decorative, never the only route. */
+.prose .heading-anchor {
+  margin-inline-start: 0.4rem;
+  font-family: var(--font-mono);
+  font-weight: 400;
+  color: var(--border-soft);
+  text-decoration: none;
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+.prose h2:hover .heading-anchor,
+.prose h3:hover .heading-anchor,
+.prose h4:hover .heading-anchor,
+.prose .heading-anchor:focus-visible {
+  opacity: 1;
+}
+
+/* ==========================================================================
+   9. CHROMA — one syntax theme mapped onto the shared accent tokens, so code
+   follows the page into dark mode instead of carrying its own palette.
+   ========================================================================== */
+
+.highlight .c,
+.highlight .cm,
+.highlight .c1,
+.highlight .cs,
+.highlight .cp,
+.highlight .cpf {
+  color: var(--muted);
+  font-style: italic;
+}
+.highlight .k,
+.highlight .kc,
+.highlight .kd,
+.highlight .kn,
+.highlight .kp,
+.highlight .kr,
+.highlight .kt {
+  color: var(--iris-ink);
+  font-weight: 600;
+}
+.highlight .s,
+.highlight .sb,
+.highlight .sc,
+.highlight .sd,
+.highlight .s2,
+.highlight .se,
+.highlight .sh,
+.highlight .si,
+.highlight .sx,
+.highlight .s1,
+.highlight .sa,
+.highlight .dl {
+  color: var(--mint-ink);
+}
+.highlight .m,
+.highlight .mb,
+.highlight .mf,
+.highlight .mh,
+.highlight .mi,
+.highlight .il,
+.highlight .mo {
+  color: var(--coral-ink);
+}
+.highlight .nb,
+.highlight .bp,
+.highlight .nf,
+.highlight .fm {
+  color: var(--sky-ink);
+}
+.highlight .nt,
+.highlight .nc,
+.highlight .nn {
+  color: var(--sky-ink);
+  font-weight: 600;
+}
+.highlight .na,
+.highlight .nv,
+.highlight .vc,
+.highlight .vg,
+.highlight .vi {
+  color: var(--amber-ink);
+}
+.highlight .o,
+.highlight .ow,
+.highlight .p {
+  color: var(--ink);
+}
+.highlight .gd {
+  color: var(--coral-ink);
+}
+.highlight .gi {
+  color: var(--mint-ink);
+}
+.highlight .ge {
+  font-style: italic;
+}
+.highlight .gs {
+  font-weight: 600;
+}
+.highlight .err {
+  color: var(--coral-ink);
+}
+.highlight .ln,
+.highlight .lnt {
+  color: var(--muted);
+  user-select: none;
+}
+
+/* ==========================================================================
+   10. TAG INDEX
+   ========================================================================== */
+
+.tag-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 1.25rem;
+  list-style: none;
+}
+
+.tag-cloud .pill {
+  min-height: 32px;
+  padding: 0.3rem 0.75rem;
+  font-size: 0.78rem;
+}
+
+.tag-cloud__count {
+  color: var(--muted);
+}
+
+/* ==========================================================================
+   11. 404
+   ========================================================================== */
+
+.notfound {
+  max-width: 34rem;
+  margin-inline: auto;
+  padding: 2rem 1.5rem 2.25rem;
+  text-align: center;
+}
+.notfound__code {
+  font-family: var(--font-mono);
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--iris-ink);
+}
+.notfound__msg {
+  margin: 0.5rem 0 1.5rem;
+  color: var(--muted);
+}
+
+/* ==========================================================================
+   12. FOOTER — static; the portfolio's interactive terminal is not ported.
+   ========================================================================== */
+
+.site-footer {
+  border-top: 2px solid var(--border-soft);
+  padding-block: 1.5rem 2rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.site-footer__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  max-width: var(--shell);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.site-footer__links {
+  margin-inline-start: auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 1rem;
+}
+
+.site-footer a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--border-soft);
+  text-underline-offset: 3px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  min-height: 44px;
+  min-width: 44px;
+}
+.site-footer a:hover {
+  color: var(--ink);
+  text-decoration-color: currentColor;
+}
+
+/* ==========================================================================
+   13. MOTION — small, frequent, 100–250ms; all of it opt-out.
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  .btn:hover,
+  .btn:active {
+    transform: none;
+  }
+}
+
+/* ==========================================================================
+   14. PRINT
+   ========================================================================== */
+
+@media print {
+  body {
+    background: #fff;
+    color: #000;
+  }
+  .site-header,
+  .article__nav,
+  .no-print {
+    display: none !important;
+  }
+  .panel,
+  .panel-flat,
+  .article {
+    box-shadow: none;
+    border: 0;
+    max-width: none;
+  }
+}

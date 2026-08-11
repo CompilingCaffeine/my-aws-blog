@@ -2,6 +2,7 @@
 date = '2026-04-15T00:00:00-07:00'
 draft = false
 title = 'How to Switch GitHub-AWS Integrations from Hard-Coded Tokens to OIDC'
+description = 'Replacing long-lived AWS access keys in GitHub Actions with OIDC: creating the identity provider, scoping the trust policy to one repo, and cutting the workflow over.'
 tags = ['github-actions', 'aws', 'oidc', 'iam', 'security', 'devops']
 +++
 

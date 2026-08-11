@@ -1,0 +1,26 @@
+{{- /*
+  Date, reading time and tags. Always rendered — hover adds emphasis, never
+  information, so touch users lose nothing.
+
+  Call: {{ partial "post-meta.html" (dict "page" . "links" true) }}
+  `links` makes the tags real anchors; inside a post row they stay plain
+  spans, because nesting a link inside the row link is invalid.
+*/ -}}
+{{- $p := .page -}}
+{{- $links := .links | default false -}}
+<div class="post-meta">
+  <time datetime="{{ $p.Date.Format "2006-01-02" }}">{{ $p.Date.Format "2006-01-02" }}</time>
+  <span class="post-meta__sep" aria-hidden="true">·</span>
+  <span>{{ $p.ReadingTime }} min read</span>
+  {{- with $p.Params.tags }}
+  <span class="post-row__tags">
+    {{- range . }}
+      {{- if $links }}
+      <a class="pill" href="{{ (printf "/tags/%s/" (urlize .)) | relURL }}">{{ . }}</a>
+      {{- else }}
+      <span class="pill">{{ . }}</span>
+      {{- end }}
+    {{- end }}
+  </span>
+  {{- end }}
+</div>

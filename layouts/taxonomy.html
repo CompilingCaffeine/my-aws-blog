@@ -1,0 +1,45 @@
+{{ define "main" }}
+{{- /* The tag index (/tags/). Quiet: pills with counts, no post bodies. */ -}}
+{{- $terms := .Pages.ByTitle -}}
+<div class="shell">
+  <div class="page-head">
+    <p class="kicker kicker--path">~/{{ .Data.Plural }}</p>
+    <h1 class="page-head__title">{{ .Title }}</h1>
+    {{- with .Content }}
+    <div class="page-head__intro">{{ . }}</div>
+    {{- else }}
+    <p class="page-head__intro">Every {{ .Data.Singular }} used across the posts.</p>
+    {{- end }}
+  </div>
+
+  <div class="panel" style="overflow: hidden">
+    <div class="titlebar">
+      <span class="dots" aria-hidden="true">
+        <i style="background: var(--sky)"></i>
+        <i style="background: var(--surface)"></i>
+        <i style="background: var(--surface)"></i>
+      </span>
+      <span class="titlebar__name">
+        {{- partial "icon.html" (dict "name" "tag" "size" 13) }}
+        <span class="titlebar__text">~/{{ .Data.Plural }}</span>
+      </span>
+      <span class="titlebar__meta">{{ len $terms }} {{ cond (eq (len $terms) 1) .Data.Singular .Data.Plural }}</span>
+    </div>
+
+    {{- if $terms }}
+    <ul class="tag-cloud">
+      {{- range $terms }}
+      <li>
+        <a class="pill" href="{{ .RelPermalink }}">
+          {{ .Data.Term }}
+          <span class="tag-cloud__count">{{ len .Pages }}</span>
+        </a>
+      </li>
+      {{- end }}
+    </ul>
+    {{- else }}
+    <p class="empty-note">Nothing tagged yet.</p>
+    {{- end }}
+  </div>
+</div>
+{{ end }}
