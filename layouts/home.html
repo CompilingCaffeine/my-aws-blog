@@ -3,7 +3,7 @@
 {{- $posts := (where site.RegularPages "Section" "in" site.Params.mainSections).ByDate.Reverse -}}
 <div class="shell">
   <div class="page-head">
-    <p class="kicker kicker--path">~/notes</p>
+    <p class="kicker kicker--path">~/blog</p>
     <h1 class="page-head__title">Working notes</h1>
     {{- with .Content }}
     <div class="page-head__intro">{{ . }}</div>

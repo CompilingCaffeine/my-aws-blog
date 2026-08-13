@@ -455,7 +455,7 @@ a.pill:hover {
   color: var(--muted);
 }
 
-/* Path-shaped kickers (~/notes, ~/tags/aws) stay lowercase: they are meant to
+/* Path-shaped kickers (~/blog, ~/tags/aws) stay lowercase: they are meant to
    read as real paths, and paths are case-sensitive. */
 .kicker--path {
   text-transform: none;
