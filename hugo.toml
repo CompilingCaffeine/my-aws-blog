@@ -12,7 +12,7 @@ theme = 'ananke'
   dir = ':cacheDir/images'
 
 [params]
-description = "Notes on software, systems, and the craft of building."
+description = "Thoughts on software, systems, and future developments."
 favicon = "favicon.svg"
 author = "Lazare Herzi"
 # Where the blog links back to.
