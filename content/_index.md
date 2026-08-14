@@ -1,6 +1,6 @@
 ---
 title: "Lazare's Coding Blog"
-description: "Notes on software, systems, and the craft of building."
+description: "Thoughts on software, systems, and future developments."
 ---
 
 Thoughts on software, systems, and future developments.
